@@ -6,6 +6,10 @@ Repositorio de scripts SQL para limpiar, normalizar y homologar datos de campañ
 
 > Aunque el directorio se llama `PLSQL`, los scripts están escritos para MySQL/MariaDB: utilizan `CREATE DEFINER`, `PREPARE`, `EXECUTE`, `REGEXP_REPLACE`, `SUBSTRING_INDEX` y variables de sesión.
 
+> Sugerencia de versiones: MySQL 8.0+ - MariaDB 10.2+
+
+> Importante: Las consultas están diseñadas para tablas con 5 números de telefonos
+
 ## Contenido
 
 | Archivo | Propósito |
@@ -39,27 +43,3 @@ CALL SP_homologar_telefono('TELEFONO_1', 'mi_tabla');
 ```
 
 Los nombres de tabla y campo deben provenir de una lista controlada. No se deben aceptar directamente desde entradas de usuario.
-
-## Hallazgos y riesgos
-
-### Hallazgos actuales fuera del alcance excluido
-
-- `Validaciones_iniciales.sql` utiliza `CREATE TEMPORARY TABLE`, CTE y `ROW_NUMBER()` en las líneas 224–269. El repositorio no declara una versión mínima de MySQL/MariaDB, por lo que el script puede fallar en motores sin soporte para esa combinación.
-- La tabla temporal `tmp_telefonos_pivot` se crea con un nombre fijo en la línea 224. Si una ejecución anterior termina antes de la línea 281, una nueva ejecución puede fallar porque la tabla temporal ya existe. Conviene iniciar con `DROP TEMPORARY TABLE IF EXISTS tmp_telefonos_pivot`.
-- El reordenamiento agrupa y enlaza únicamente por `ID` en las líneas 246–249 y 271–273. Si `ID` no es único, teléfonos de diferentes registros pueden mezclarse y el `UPDATE` puede afectar más de una fila por resultado.
-- La solución exige que exista la columna `ID` y que tenga el mismo tipo y representación en la tabla origen y en la tabla temporal. No hay una validación previa de esa clave.
-- La lógica está fija a cinco columnas (`TELEFONO_1` a `TELEFONO_5`) en múltiples secciones; agregar o reducir teléfonos requiere editar manualmente el script.
-- El repositorio no incluye un esquema mínimo que documente tipos, índices o restricciones esperadas para `ID`, `SALDO`, `NOMBRE` y los cinco teléfonos.
-
-## Recomendaciones prioritarias
-
-1. Documentar la versión mínima compatible y probar `WITH`, `ROW_NUMBER()` y `CREATE TEMPORARY TABLE` en el motor objetivo.
-2. Agregar `DROP TEMPORARY TABLE IF EXISTS tmp_telefonos_pivot` antes de crear la tabla temporal.
-3. Confirmar que `ID` sea una clave única; si no lo es, usar la clave primaria real en el `GROUP BY` y el `JOIN`.
-4. Validar la existencia y el tipo de `ID` antes de ejecutar el reordenamiento.
-5. Documentar explícitamente el límite de cinco teléfonos o parametrizar el diseño.
-6. Añadir un esquema de referencia o contrato de columnas para las tablas que consumen estos scripts.
-
-## Estado actual
-
-El repositorio contiene utilidades SQL reutilizables. Esta revisión excluye deliberadamente los placeholders, delimitadores, SQL dinámico, transacciones/auditoría/manejo de errores/pruebas, `DEFINER`, `latin1`, duplicación y transformaciones de datos. Los hallazgos documentados aquí se concentran en compatibilidad del motor, reutilización de tablas temporales, integridad de la clave de enlace y supuestos de esquema.
