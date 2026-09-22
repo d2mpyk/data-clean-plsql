@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Repositorio de scripts SQL para limpiar, normalizar y homologar datos de campañas, principalmente nombres, direcciones, teléfonos, saldos e identificadores.
+Repositorio de scripts SQL para limpiar, normalizar y homologar datos de campañas, principalmente nombres, direcciones, teléfonos, email's, saldos e identificadores.
 
 > Aunque el directorio se llama `PLSQL`, los scripts están escritos para MySQL/MariaDB: utilizan `CREATE DEFINER`, `PREPARE`, `EXECUTE`, `REGEXP_REPLACE`, `SUBSTRING_INDEX` y variables de sesión.
 
@@ -15,6 +15,7 @@ Repositorio de scripts SQL para limpiar, normalizar y homologar datos de campañ
 | Archivo | Propósito |
 | --- | --- |
 | `Validaciones_iniciales.sql` | Limpieza y validaciones iniciales sobre una tabla de campaña. Incluye nombres, saldos, teléfonos e ID. |
+| `Validaciones_iniciales_EMAIL.sql` | Limpieza y validaciones iniciales sobre una tabla de campaña, solo para email's. Incluye email, ID, ID_CAMPANIA. |
 | `FN_homologar.sql` | Función genérica de normalización de texto. |
 | `FN_homologar_direccion.sql` | Normalización de direcciones, caracteres especiales y problemas de codificación. |
 | `FN_homologar_telefono.sql` | Limpieza de teléfonos y eliminación de caracteres no deseados. |
